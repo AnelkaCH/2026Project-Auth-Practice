@@ -7,7 +7,8 @@ export async function GET(request) {
     return auth.response;
   }
 
-  const { id, email, created_at } = auth.user;
-
-  return Response.json({ id, email, created_at }, { status: 200 });
+  return Response.json(
+    { message: `Welcome back, ${auth.user.email}! This is your private dashboard.` },
+    { status: 200 }
+  );
 }
