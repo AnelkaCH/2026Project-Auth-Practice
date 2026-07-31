@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FlyRank Auth API",
+    "description": "Secure authentication API using Supabase Auth. Click **Authorize**, paste your JWT access token, then try the protected endpoints.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "http://localhost:3000" }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "summary": "Create a new user account",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "test@example.com" },
+                  "password": { "type": "string", "format": "password", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "400": { "description": "Missing email/password or Supabase error" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Log in and receive JWT tokens",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "test@example.com" },
+                  "password": { "type": "string", "format": "password", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": { "type": "string", "description": "JWT access token" },
+                    "refresh_token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing email/password" },
+          "401": { "description": "Invalid login credentials" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Terminate the user session",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Successfully logged out" },
+          "401": { "description": "Access token required or invalid/expired" }
+        }
+      }
+    },
+    "/protected/profile": {
+      "get": {
+        "summary": "Read private user profile data",
+        "tags": ["Protected"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "format": "uuid" },
+                    "email": { "type": "string", "format": "email" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Access token required or invalid/expired" }
+        }
+      }
+    },
+    "/protected/dashboard": {
+      "get": {
+        "summary": "Read private dashboard data",
+        "tags": ["Protected"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Access token required or invalid/expired" }
+        }
+      }
+    },
+    "/public/info": {
+      "get": {
+        "summary": "Read public, unprotected data",
+        "tags": ["Public"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
